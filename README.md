@@ -11,8 +11,6 @@ Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.so
 
 开发这个插件的动机，是想让 [hexo](https://hexo.io) 与 [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/admonitions/) 的提示信息兼容，让系列文章在基于 MkDocs 搭建的子站中有更好的阅读体验。
 
-查看更多内容，请访问博文：[Hexo-admonition 插件安装使用指南](https://www.lixl.cn/2020/041837756.html)。
-
 ## 安装说明
 
 ### 安装插件
@@ -58,6 +56,8 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 - `question`
 - `example`
 - `quote`
+
+各具体样式可参考https://s2.loli.net/2025/07/30/psSNAI6FeMCj5Pk.png
 
 ### 设置/隐藏标题
 
