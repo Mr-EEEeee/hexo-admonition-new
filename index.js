@@ -1,33 +1,112 @@
-'use strict';
-
-var md = require('markdown-it')('commonmark');
+const md = require('markdown-it')('commonmark');
 
 hexo.extend.filter.register('before_post_render', function (data) {
-  let strRegExp = /(<\!-- *)(note|info|todo|warning|attention|caution|failure|missing|fail|error) (.*?)--> *\n((.*\n)*?)(<\!-- end -->\n)/;
-  let admonitionRegExp = new RegExp(strRegExp, 'gmi');
+  const lines = data.content.split(/\r?\n/);
+  const result = [];
 
-  let strData;
-  if (admonitionRegExp.test(data.content)) {
+  const iconMap = {
+    anote: 'mdi-note-outline',
+    info: 'mdi-information-outline',
+    todo: 'mdi-format-list-checkbox',
+    warning: 'mdi-alert-outline',
+    attention: 'mdi-alert-circle-outline',
+    caution: 'mdi-alert-decagram-outline',
+    failure: 'mdi-close-octagon-outline',
+    missing: 'mdi-close-octagon-outline',
+    fail: 'mdi-close-octagon-outline',
+    error: 'mdi-alert-circle-outline',
+    danger: 'mdi-alert-circle-outline',
+    bug: 'mdi-bug-outline',
+    tip: 'mdi-lightbulb-on-outline',
+    success: 'mdi-check-circle-outline',
+    question: 'mdi-comment-question-outline',
+    example: 'mdi-file-code-outline',
+    quote: 'mdi-format-quote-close'
+  };
 
-    strData = data.content.replace(admonitionRegExp, function (matchStr, p1, p2, p3, p4) {
+  const defaultTitles = {
+    anote: 'Note',
+    info: 'Info',
+    todo: 'To Do',
+    warning: 'Warning',
+    attention: 'Attention',
+    caution: 'Caution',
+    failure: 'Failure',
+    missing: 'Missing',
+    fail: 'Fail',
+    error: 'Error',
+    danger: 'Danger',
+    bug: 'Bug',
+    tip: 'Tip',
+    success: 'Success',
+    question: 'Question',
+    example: 'Example',
+    quote: 'Quote'
+  };
 
-      p4 = p4.split(/\n|\r|\r\n/);
+  const blockRegex = /^(\s*)!!!\s*(anote|info|todo|warning|attention|caution|failure|missing|fail|error|danger|bug|tip|success|question|example|quote)\s*(?:"(.*?)")?\s*$/i;
 
-      let admonitionContent = '';
-      for (const v of p4) {
-        admonitionContent += v.trim();
-        admonitionContent += '\n';3
-      }
+  function parseAdmonition(startIndex, parentIndent = '') {
+    const match = lines[startIndex].match(blockRegex);
+    if (!match) return { end: startIndex, html: null };
 
-      if (p3.replace(/\s+/g, '') === '""' || p3.replace(/\s+/g, '') === '') {
-        return '<div class="admonition ' + p2.toLowerCase() + '">' + md.render(admonitionContent) + '</div>\n\n';
+    const [_, indent, typeRaw, titleRaw] = match;
+    const type = typeRaw.toLowerCase();
+    const isTitleExplicitlyEmpty = titleRaw === "";
+    const hasTitle = !isTitleExplicitlyEmpty;
+    const title = titleRaw?.trim() || defaultTitles[type];
+    const icon = iconMap[type] || 'mdi-alert-circle-outline';
+
+    let contentLines = [];
+    let i = startIndex + 1;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      const nextMatch = line.match(blockRegex);
+      const isNested = nextMatch && nextMatch[1].length > indent.length;
+
+      if (isNested) {
+        const nested = parseAdmonition(i, nextMatch[1]);
+        if (nested.html) contentLines.push(nested.html);
+        i = nested.end;
+      } else if (nextMatch) {
+        break;
+      } else if (/^\s*$/.test(line) || line.startsWith(indent + '    ') || line.startsWith(indent + '\t')) {
+        contentLines.push(line.replace(new RegExp(`^${indent}( {4}|\t)`), ''));
+        i++;
       } else {
-        p3 = p3.trim() === '' ? p2 : p3.replace(/(^ |")|("| $)/g, '');
-        return '<div class="admonition ' + p2.toLowerCase() + '"><p class="admonition-title">' + p3 + '</p>' + md.render(admonitionContent) + '</div>\n\n';
+        break;
       }
-    });
-    data.content = strData;
+    }
+
+    const rendered = md.render(contentLines.join('\n'));
+
+    const titleHtml = hasTitle
+      ? `<p class="admonition-title"><span class="mdi ${icon} admonition-icon"></span>${title}</p>`
+      : '';
+
+    const html = `<div class="admonition ${type}">
+${titleHtml}
+${rendered}
+</div>`;
+
+    return { end: i, html };
   }
 
+  let i = 0;
+  while (i < lines.length) {
+    const match = lines[i].match(blockRegex);
+    if (match) {
+      const parsed = parseAdmonition(i);
+      if (parsed.html) result.push(parsed.html);
+      i = parsed.end;
+    } else {
+      result.push(lines[i]);
+      i++;
+    }
+  }
+
+  data.content = result.join('\n');
   return data;
 });
