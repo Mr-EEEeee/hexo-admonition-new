@@ -18,7 +18,7 @@ Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.so
 ```bash
 npm install hexo-admonition-new --save
 ```
-还需配置 css 文件方可生效，见下文。
+还需自定义配置 css 文件方可生效，请参考[样式配置](#样式配置)。
 ## 使用指南
 
 ### 语法说明
@@ -30,7 +30,6 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
     这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 anote，并设置了自定义标题。
 
     提示内容开头留 4 个空格，可以有多行，最后用空行结束此标记。
-
 ```
 
 在 Hexo 渲染前，将被转换成如下内容：
@@ -85,7 +84,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 
 ### 嵌套支持
 
-在 `hexo-admonition` 内部，支持嵌套多层和引用以及代码块等，由首页效果图可见。
+在 `hexo-admonition` 内部，支持嵌套多层和引用以及代码块等，由首页[效果图](#简介)可见。
 
 ```text
 !!! warning "小心！"
@@ -99,6 +98,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
         ```js
         console.log("支持代码块");
         ```
+        
     !!! info "内层块"
       这是内层嵌套的提示内容
 ```
