@@ -23,23 +23,25 @@ npm install hexo-admonition-new --save
 
 ### 语法说明
 
-Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（`type`）及标题（`title`）。例如:
+Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（`type`）及标题（`"title"`）。例如:
 
 ```text
-!!! anote Hexo-admonition-new 插件使用示例
+!!! anote Hexo-admonition-new "插件使用示例"
     这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 anote，并设置了自定义标题。
-
-    提示内容开头留 4 个空格，可以有多行，最后用空行结束此标记。
+提示内容开头留 4 个空格，可以有多行，换行行首不留空后自动结束提示块。
 ```
 
 在 Hexo 渲染前，将被转换成如下内容：
 
 ```html
-<div class="admonition anote ">
-  <p class="admonition-title">Hexo-admonition 插件使用示例</p>
+<div class="admonition anote">
+  <p class="admonition-title">
+    <span class="mdi mdi-information-outline admonition-icon"></span>
+    "Hexo-admonition 插件使用示例"
+  </p>
   <p>这是基于 hexo-admonition 插件渲染的一条提示信息。类型为 note，并设置了自定义标题。</p>
-  <p>提示内容开头留 4 个空格，可以有多行，最后用空行结束此标记。</p>
 </div>
+<p>提示内容开头留 4 个空格，可以有多行，换行行首不留空后自动结束提示块。</p>
 ```
 
 ### 支持的类型
@@ -69,7 +71,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 
 效果如下：
 
-![默认标题警告提示块](https://pic.lixl.cn/2020/image-20200419232137875.png)
+![原默认标题警告提示块](https://pic.lixl.cn/2020/image-20200419232137875.png)
 
 如果不想显示标题，可以将 `title` 设置为 `""`：
 
@@ -80,7 +82,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 
 效果如下：
 
-![无标题警告提示块](https://pic.lixl.cn/2020/image-20200419232337937.png)
+![原无标题警告提示块](https://pic.lixl.cn/2020/image-20200419232337937.png)
 
 ### 嵌套支持
 
