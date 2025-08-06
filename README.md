@@ -56,7 +56,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 - `example`
 - `quote`
 
-各具体样式可参考https://s2.loli.net/2025/07/30/psSNAI6FeMCj5Pk.png
+各具体样式可参考https://s2.loli.net/2025/08/07/nvY19KgcpSDoyHw.png
 
 ### 设置/隐藏标题
 
