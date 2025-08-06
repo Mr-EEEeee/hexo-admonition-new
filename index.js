@@ -86,12 +86,10 @@ hexo.extend.filter.register('before_post_render', function (data) {
       ? `<p class="admonition-title"><span class="mdi ${icon} admonition-icon"></span>${title}</p>`
       : '';
 
-    const html = `<div class="admonition ${type}">
-${titleHtml}
-${rendered}
-</div>`;
+    const html = `<div class="admonition ${type}">${titleHtml}${rendered}</div>`;
 
-    return { end: i, html };
+    // 返回结束位置，并在提示块后插入空行（只影响提示块，不影响普通文本的换行）
+    return { end: i, html: html + '\n' };  // 插入一个空行（仅用于分隔）
   }
 
   let i = 0;
@@ -108,5 +106,6 @@ ${rendered}
   }
 
   data.content = result.join('\n');
+
   return data;
 });
