@@ -26,9 +26,9 @@ npm install hexo-admonition-new --save
 Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（`type`）及标题（`"title"`）。例如:
 
 ```text
-!!! anote Hexo-admonition-new "插件使用示例"
+!!!anote Hexo-admonition-new "插件使用示例"
     这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 anote，并设置了自定义标题。
-提示内容开头留 4 个空格，可以有多行，换行行首不留空后自动结束提示块。
+提示内容开头留4个空格，可以有多行，行尾2个空格或空一行可换行，换行行首不留空后自动结束提示块。
 ```
 
 在 Hexo 渲染前，将被转换成如下内容：
@@ -39,10 +39,13 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
     <span class="mdi mdi-information-outline admonition-icon"></span>
     "Hexo-admonition 插件使用示例"
   </p>
-  <p>这是基于 hexo-admonition 插件渲染的一条提示信息。类型为 note，并设置了自定义标题。</p>
+  <div class="admonition-content">
+    <p>这是基于 hexo-admonition 插件渲染的一条提示信息。类型为 note，并设置了自定义标题。</p>
+  </div>
 </div>
-<p>提示内容开头留 4 个空格，可以有多行，换行行首不留空后自动结束提示块。</p>
+<p>提示内容开头留4个空格，可以有多行，行尾2个空格或空一行可换行，换行行首不留空后自动结束提示块。</p>
 ```
+**整体上提示块内语法遵从原生 markdown 语法，与 Hexo 中的语法略有区别，后续有时间考虑优化为取消预渲染，改为使用 Hexo 渲染来保持语法统一**
 
 ### 支持的类型
 
@@ -65,7 +68,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 标题 `title` 是可选的，当未设置时，将以 `type` 作为默认值:
 
 ```text
-!!! warning
+!!!warning
     这是一条采用默认标题的警告信息。
 ```
 
@@ -76,7 +79,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 如果不想显示标题，可以将 `title` 设置为 `""`：
 
 ```text
-!!! Warning ""
+!!!Warning ""
     这是一条不带标题的警告信息。
 ```
 
@@ -119,7 +122,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 
 ```css
 .admonition {
-  margin: 1.5em 0;
+  margin: 1em 0;
   padding: 0rem;
   border-left: 0.3rem solid;
   border-radius: 0.4rem;
