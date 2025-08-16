@@ -46,6 +46,11 @@ hexo.extend.filter.register('before_post_render', function (data) {
 
   const blockRegex = /^(\s*)!!!\s*(anote|info|todo|warning|attention|caution|failure|missing|fail|error|danger|bug|tip|success|question|example|quote)\s*(?:"(.*?)")?\s*$/i;
 
+  // helper: escape regex special chars in indent string
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   function parseAdmonition(startIndex, parentIndent = '') {
     const match = lines[startIndex].match(blockRegex);
     if (!match) return { end: startIndex, html: null };
@@ -60,11 +65,15 @@ hexo.extend.filter.register('before_post_render', function (data) {
     let contentLines = [];
     let i = startIndex + 1;
 
+    // build regex to strip only the parent indent first, then optional 4 spaces or a tab
+    const escIndent = escapeRegExp(indent || '');
+    const stripRegex = new RegExp('^' + escIndent + '(?: {4}|\t)?');
+
     while (i < lines.length) {
       const line = lines[i];
 
       const nextMatch = line.match(blockRegex);
-      const isNested = nextMatch && nextMatch[1].length > indent.length;
+      const isNested = nextMatch && nextMatch[1].length > (indent ? indent.length : 0);
 
       if (isNested) {
         const nested = parseAdmonition(i, nextMatch[1]);
@@ -72,8 +81,9 @@ hexo.extend.filter.register('before_post_render', function (data) {
         i = nested.end;
       } else if (nextMatch) {
         break;
-      } else if (/^\s*$/.test(line) || line.startsWith(indent + '    ') || line.startsWith(indent + '\t')) {
-        contentLines.push(line.replace(new RegExp(`^${indent}( {4}|\t)`), ''));
+      } else if (/^\s*$/.test(line) || line.startsWith((indent || '') + '    ') || line.startsWith((indent || '') + '\t')) {
+        // remove only the detected parent indent + optional one level (4 spaces or tab)
+        contentLines.push(line.replace(stripRegex, ''));
         i++;
       } else {
         break;
@@ -86,10 +96,11 @@ hexo.extend.filter.register('before_post_render', function (data) {
       ? `<p class="admonition-title"><span class="mdi ${icon} admonition-icon"></span>${title}</p>`
       : '';
 
-    const html = `<div class="admonition ${type}">${titleHtml}${rendered}</div>`;
+    // wrap rendered content in a container so styling applies consistently
+    const html = `<div class="admonition ${type}">${titleHtml}<div class="admonition-content">${rendered}</div></div>`;
 
-    // 返回结束位置，并在提示块后插入空行（只影响提示块，不影响普通文本的换行）
-    return { end: i, html: html + '\n' };  // 插入一个空行（仅用于分隔）
+    // return end index and html (keep a separating newline)
+    return { end: i, html: html + '\n' };
   }
 
   let i = 0;
@@ -106,6 +117,5 @@ hexo.extend.filter.register('before_post_render', function (data) {
   }
 
   data.content = result.join('\n');
-
   return data;
 });
