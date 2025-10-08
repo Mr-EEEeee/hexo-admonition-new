@@ -1,4 +1,6 @@
 const md = require('markdown-it')('commonmark');
+const fs = require('fs');
+const path = require('path');
 
 hexo.extend.filter.register('before_post_render', function (data) {
   const lines = data.content.split(/\r?\n/);
@@ -118,4 +120,48 @@ hexo.extend.filter.register('before_post_render', function (data) {
 
   data.content = result.join('\n');
   return data;
+});
+
+// Inject CSS styles
+hexo.extend.filter.register('after_generate', function() {
+  // Check if CSS injection is disabled in config
+  const config = hexo.config.admonition || {};
+  if (config.inject_css === false) {
+    return;
+  }
+  
+  const cssPath = path.join(__dirname, 'admonition.css');
+  let css;
+  try {
+    css = fs.readFileSync(cssPath, 'utf8');
+  } catch (error) {
+    hexo.log.error(`Admonition: Failed to load CSS file: ${error.message}`);
+    return;
+  }
+  
+  const route = hexo.route;
+  const routeList = route.list();
+  const routes = routeList.filter(hpath => hpath.endsWith('.html'));
+  
+  const htmls = {};
+  return Promise.all(routes.map(hpath => {
+    return new Promise((resolve, reject) => {
+      const contents = route.get(hpath);
+      let htmlTxt = '';
+      contents.on('data', (chunk) => (htmlTxt += chunk));
+      contents.on('end', () => {
+        if (htmlTxt.includes('admonition') && !htmlTxt.includes('admonition-styles')) {
+          const newContent = htmlTxt.replace('</head>', `<style id="admonition-styles">${css}</style></head>`);
+          htmls[hpath] = newContent;
+        }
+        resolve();
+      });
+    });
+  }))
+  .then(() => {
+    const htmlPaths = Object.keys(htmls);
+    for (const hpath of htmlPaths) {
+      route.set(hpath, htmls[hpath]);
+    }
+  });
 });

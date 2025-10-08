@@ -4,14 +4,17 @@
   "description": "A Hexo plugin that adds customizable admonition blocks (note, info, warning, etc.) with icons and styles. Hexo 插件，支持自定义提示块（如 note、info、warning 等），并提供图标和样式设置。",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/*.test.js"
   },
   "keywords": [
     "hexo",
     "admonition"
   ],
   "dependencies": {
-    "markdown-it": "^9.1.0"
+    "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.0.0"
   },
   "author": "逸人",
   "license": "MIT"
