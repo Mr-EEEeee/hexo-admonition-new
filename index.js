@@ -150,7 +150,7 @@ hexo.extend.filter.register('after_generate', function() {
       let htmlTxt = '';
       contents.on('data', (chunk) => (htmlTxt += chunk));
       contents.on('end', () => {
-        if (htmlTxt.includes('admonition') && !htmlTxt.includes('admonition-styles')) {
+        if (htmlTxt.includes('class="admonition') && !htmlTxt.includes('id="admonition-styles"')) {
           const newContent = htmlTxt.replace('</head>', `<style id="admonition-styles">${css}</style></head>`);
           htmls[hpath] = newContent;
         }
