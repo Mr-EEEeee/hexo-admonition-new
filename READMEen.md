@@ -1,118 +1,118 @@
 <div align="center">
 
-[English](./README_EN.md) | 简体中文
+English | [简体中文](./README.md)
 
 </div>
 
 ---
 
-# Hexo-admonition-new 插件安装使用指南
+# Hexo-admonition-new Plugin Installation and Usage Guide
 
-## 简介
+## Introduction
 
-Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.sourceforge.io/docs/ref/rst/directives.html) 的警告提示块添加到 Markdown 文档中。支持多种提示类型（note、warning、error 等），并提供折叠功能、嵌套支持和夜间模式。效果如图：
+A Hexo content assistance plugin that supports adding admonition blocks similar to [reStructuredText](https://docutils.sourceforge.io/docs/ref/rst/directives.html) into Markdown documents. Supports multiple admonition types (note, warning, error, etc.), and provides collapsible functionality, nesting support, and dark mode. Effect as shown:
 
-![Hexo-admonition-new 示例效果1](https://s2.loli.net/2026/01/12/A7e54iWoNvcwlRt.png)
-![Hexo-admonition-new 示例效果2](https://s2.loli.net/2026/01/12/DQOCa68dxrlbkJv.png)
+![Hexo-admonition-new Example Effect 1](https://s2.loli.net/2026/01/12/A7e54iWoNvcwlRt.png)
+![Hexo-admonition-new Example Effect 2](https://s2.loli.net/2026/01/12/DQOCa68dxrlbkJv.png)
 
-**本插件源于 [hexo-admonition](https://github.com/lxl80/hexo-admonition) 迭代更新，完善了部分内容**
+**This plugin is an iterative update based on [hexo-admonition](https://github.com/lxl80/hexo-admonition), with improvements to some content**
 
-开发这个插件的动机，是想让 [hexo](https://hexo.io) 与 [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/admonitions/) 的提示信息兼容，让系列文章在基于 MkDocs 搭建的子站中有更好的阅读体验。
+The motivation for developing this plugin was to make [hexo](https://hexo.io) compatible with admonitions from [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/admonitions/), providing a better reading experience for article series on subsites built with MkDocs.
 
-## 安装说明
+## Installation
 
-### 安装插件
+### Install Plugin
 
 ```bash
 npm install hexo-admonition-new --save
 ```
 
-### 样式配置
+### Style Configuration
 
-#### 1. 引入图标库
+#### 1. Include Icon Library
 
-在主题的 `</head>` 标签之前添加：
+Add before the `</head>` tag in your theme:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
 ```
 
-与下文 CSS 文件配合以显示图标样式，图标样式配置在插件 index.js 文件首部 `ADMONITION_CONFIG`，也可自行修改。
+This works with the CSS file below to display icon styles. Icon style configuration is at the beginning of the plugin's index.js file in `ADMONITION_CONFIG`, which can also be modified as needed.
 
-#### 2. 引入样式文件
+#### 2. Include Stylesheet
 
-将提供的 CSS 文件放入主题的自定义样式文件夹（如 `Blog/source/css`），并在 `</head>` 标签之前引入：
+Place the provided CSS file in your theme's custom style folder (e.g., `Blog/source/css`), and include it before the `</head>` tag:
 
 ```html
 <link rel="stylesheet" href="/css/admonition.css">
 ```
 
-可自定义配置 CSS 文件，请参考[自定义配置](#自定义配置)。
+You can customize the CSS file configuration. Please refer to [Custom Configuration](#custom-configuration).
 
-## 使用指南
+## Usage Guide
 
-### 基础语法
+### Basic Syntax
 
-Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（type）及标题（"title"）。
+Hexo-admonition-new follows a simple syntax: each block starts with `!!!`, followed by a keyword representing the admonition type and a title ("title").
 
 ```markdown
-!!! info "自定义标题"
-    这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 info，并设置了自定义标题。
-    支持多行内容。
+!!! info "Custom Title"
+    This is an admonition message rendered by the hexo-admonition-new plugin. The type is info, with a custom title set.
+    Multiple lines are supported.
 ```
-**注意**：提示内容需要缩进 4 个空格或 1 个制表符，换行行首不留空后自动结束提示块。
+**Note**: Admonition content needs to be indented by 4 spaces or 1 tab. The admonition block automatically ends when a new line starts without indentation.
 
-在 Hexo 渲染前，将被转换成如下内容：
+Before Hexo rendering, it will be converted to:
 
-```CSS
+```html
 <div class="admonition info">
   <p class="admonition-title">
     <span class="mdi mdi-information-outline admonition-icon"></span>
-    "自定义标题"
+    "Custom Title"
   </p>
   <div class="admonition-content">
     <p>
-      "这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 info，并设置了自定义标题。"
+      "This is an admonition message rendered by the hexo-admonition-new plugin. The type is info, with a custom title set."
       <br>
-      "支持多行内容。"
+      "Multiple lines are supported."
     </p>
   </div>
 </div>
 ```
 
-### 折叠功能
+### Collapsible Functionality
 
-#### 可折叠且默认展开
+#### Collapsible and Expanded by Default
 
-以 `!!!+` 开头
+Start with `!!!+`
 
 ```markdown
-!!!+ warning "点击可折叠"
-    这个提示块默认展开，可以点击标题折叠它。
-    适合包含重要但可选的补充信息。
+!!!+ warning "Click to Collapse"
+    This admonition block is expanded by default and can be collapsed by clicking the title.
+    Suitable for important but optional supplementary information.
 ```
 
 ![](https://s2.loli.net/2026/01/12/q6dSuAfN15MTXlV.png)
 
 
-#### 可折叠且默认折叠
+#### Collapsible and Collapsed by Default
 
-以 `!!!-` 开头
+Start with `!!!-`
 
 ```markdown
-!!!- warning "点击展开查看警告"
-    这个警告块默认折叠，需要点击才能看到内容。
-    适合包含详细的技术细节或不常用的信息。
+!!!- warning "Click to Expand Warning"
+    This warning block is collapsed by default and requires clicking to view the content.
+    Suitable for detailed technical information or infrequently used content.
 ```
 
 ![](https://s2.loli.net/2026/01/12/o7JFw5cQ4kCZlys.png)
 
 
-### 支持的类型
+### Supported Types
 
-提示类型 `type` 将用作 CSS 类名称，暂支持如下类型：
+The admonition `type` will be used as a CSS class name. Currently supported types include:
 
-- `anote` **不使用 "note" 为防止受 CSS 样式影响**
+- `anote` **"note" is not used to prevent CSS style conflicts**
 - `info`, `todo`
 - `warning`, `attention`, `caution`
 - `error`, `failure`, `missing`, `fail`, `danger`, `bug`
@@ -122,82 +122,82 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 - `example`
 - `quote`
 
-各类型样式效果可参考：https://s2.loli.net/2025/08/17/po7nrv1CyJlhG8q.png
+For style effects of each type, refer to: https://s2.loli.net/2025/08/17/po7nrv1CyJlhG8q.png
 
-### 自定义标题
+### Custom Titles
 
-#### 使用默认标题
+#### Using Default Title
 
-标题 `title` 是可选的，当未设置时，将以 `type` 作为默认值:
+The `title` is optional. When not set, `type` will be used as the default value:
 
-```text
+```markdown
 !!! warning
-    这是一条采用默认标题的警告信息。
+    This is a warning message using the default title.
 ```
 
 ![](https://s2.loli.net/2026/01/12/a7SJKUlWDh1PL9s.png)
 
-#### 自定义标题
+#### Custom Title
 
 ```markdown
-!!! warning "小心！"
-    这是自定义标题的警告信息。
+!!! warning "Careful!"
+    This is a warning message with a custom title.
 ```
 
 ![](https://s2.loli.net/2026/01/12/KtNDYOrg2AbmpLM.png)
 
 
-#### 隐藏标题
+#### Hide Title
 
-如果不想显示标题，可以将 `title` 设置为 `""`：
+If you don't want to display a title, set `title` to `""`:
 
 ```markdown
 !!! warning ""
-    这是不带标题的警告信息。
+    This is a warning message without a title.
 ```
 
 ![](https://s2.loli.net/2026/01/12/QWimgGxaMyw9AOn.png)
 
-#### 隐藏正文
+#### Hide Content
 
 ```markdown
-!!! warning "这是只有标题的提示信息"
+!!! warning "This is an admonition with title only"
 ```
 
 ![](https://s2.loli.net/2026/01/12/wTXKWGP6hfdbC9j.png)
 
-### 嵌套支持
+### Nesting Support
 
-支持嵌套多层和引用以及代码块等，由首页[效果图](#简介)可见。
+Supports multiple levels of nesting, blockquotes, code blocks, etc., as shown in the [example images](#introduction).
 
 ```markdown
-!!! warning "小心！"
-    这是一个警告内容。
+!!! warning "Careful!"
+    This is a warning content.
 
-    > 嵌套引用内容
+    > Nested blockquote content
 
-    - 列表项 1
-    - 列表项 2
+    - List item 1
+    - List item 2
 
         ```js
-        console.log("支持代码块");
+        console.log("Code blocks supported");
         ```
-    你好
+    Hello
 
-    !!! info "内层块"
-        这是内层嵌套的提示内容
-            !!! danger "内层块"
-                这是内层嵌套的提示内容
+    !!! info "Inner Block"
+        This is nested inner admonition content
+            !!! danger "Inner Block"
+                This is nested inner admonition content
 ```
 
-## CSS 文件
+## CSS File
 
-我懒得区分 error, danger 等的图标和颜色了，可按自己喜好修改：
+I didn't bother distinguishing icons and colors for error, danger, etc. You can modify according to your preferences:
 
 ```css
-/* ==================== CSS 变量定义 ==================== */
+/* ==================== CSS Variable Definitions ==================== */
 :root {
-  /* 基础样式变量 */
+  /* Base style variables */
   --admonition-bg: #f9f9f9;
   --admonition-title-bg: rgba(0, 0, 0, 0.03);
   --admonition-title-hover-bg: rgba(0, 0, 0, 0.06);
@@ -206,7 +206,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   --admonition-border-width: 0.3rem;
   --admonition-border-radius: 0.4rem;
 
-  /* 类型颜色 - 浅色模式 */
+  /* Type colors - Light mode */
   --color-anote: #448aff;
   --color-anote-bg: #448aff1a;
   --color-anote-text: #2962ff;
@@ -244,7 +244,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   --color-quote-text: #424242;
 }
 
-/* 深色模式变量 */
+/* Dark mode variables */
 [data-theme="dark"] {
   --admonition-bg: #1e1e1e;
   --admonition-title-bg: rgba(255, 255, 255, 0.05);
@@ -284,7 +284,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   --color-quote-text: #eeeeee;
 }
 
-/* ==================== 基础样式 ==================== */
+/* ==================== Base Styles ==================== */
 .admonition {
   margin: 1em 0;
   padding: 0;
@@ -315,7 +315,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   margin-top: 0.1rem;
 }
 
-/* 内容区域 */
+/* Content area */
 .admonition>.admonition-content {
   margin: var(--admonition-padding);
 }
@@ -324,7 +324,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   margin: var(--admonition-padding);
 }
 
-/* ==================== 折叠功能 ==================== */
+/* ==================== Collapsible Functionality ==================== */
 .admonition-collapsible-wrapper {
   padding: 0;
   overflow: visible;
@@ -369,13 +369,13 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   transform: rotate(180deg);
 }
 
-/* 折叠内容 */
+/* Collapsible content */
 .admonition-collapsible .admonition-content {
   padding: var(--admonition-padding);
   animation: slideDown 0.25s ease-out;
 }
 
-/* 嵌套块 */
+/* Nested blocks */
 .admonition-collapsible .admonition-content>.admonition {
   margin: 0.6rem 0;
 }
@@ -413,7 +413,7 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   }
 }
 
-/* ==================== 类型颜色（使用变量） ==================== */
+/* ==================== Type Colors (using variables) ==================== */
 
 /* Note */
 .admonition.anote {
@@ -539,11 +539,11 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 }
 ```
 
-## 自定义配置
+## Custom Configuration
 
-### 修改颜色
+### Modify Colors
 
-编辑 CSS 文件中的变量：
+Edit the variables in the CSS file:
 
 ```css
 :root {
@@ -553,11 +553,11 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 }
 ```
 
-### 修改图标
+### Modify Icons
 
-图标来自 [Material Design Icons](https://materialdesignicons.com/)
+Icons are from [Material Design Icons](https://materialdesignicons.com/)
 
-编辑插件 JavaScript 文件中的 `iconMap`：
+Edit the `iconMap` in the plugin's JavaScript file:
 
 ```javascript
 const ADMONITION_CONFIG = {
@@ -568,10 +568,10 @@ const ADMONITION_CONFIG = {
 };
 ```
 
-### 添加新类型
+### Add New Types
 
-1. 在 JavaScript 的 `iconMap` 和 `defaultTitles` 中添加新类型
-2. 在 CSS 中添加对应的颜色样式
+1. Add the new type to `iconMap` and `defaultTitles` in JavaScript
+2. Add corresponding color styles in CSS
 
 ```javascript
 // JavaScript
@@ -602,7 +602,7 @@ const ADMONITION_CONFIG = {
 
 MIT
 
-## 参考
+## References
 
 - [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/admonitions/)
 - [Material Design Icons](https://materialdesignicons.com/)
