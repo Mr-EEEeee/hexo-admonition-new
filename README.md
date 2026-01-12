@@ -2,10 +2,10 @@
 
 ## 简介
 
-Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.sourceforge.io/docs/ref/rst/directives.html) 的警告提示块添加到 Markdown 文档中。例如 note、warning、error 等提示块，支持嵌套、夜间模式，效果如图：
+Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.sourceforge.io/docs/ref/rst/directives.html) 的警告提示块添加到 Markdown 文档中。支持多种提示类型（note、warning、error 等），并提供折叠功能、嵌套支持和夜间模式。效果如图：
 
-![Hexo-admonition-new 示例效果1](https://s2.loli.net/2025/07/30/Gcb7FSoKhm8UiO4.png)
-![Hexo-admonition-new 示例效果2](https://s2.loli.net/2025/07/30/NWSekX91RPY73my.png)
+![Hexo-admonition-new 示例效果1](https://s2.loli.net/2026/01/12/A7e54iWoNvcwlRt.png)
+![Hexo-admonition-new 示例效果2](https://s2.loli.net/2026/01/12/DQOCa68dxrlbkJv.png)
 
 **本插件源于 [hexo-admonition](https://github.com/lxl80/hexo-admonition) 迭代更新，完善了部分内容**
 
@@ -18,80 +18,151 @@ Hexo 内容辅助插件，支持将类似 [reStructuredText](https://docutils.so
 ```bash
 npm install hexo-admonition-new --save
 ```
-还需自定义配置 css 文件方可生效，请参考[样式配置](#样式配置)。
+
+### 样式配置
+
+#### 1. 引入图标库
+
+在主题的 `</head>` 标签之前添加：
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
+```
+
+与下文 CSS 文件配合以显示图标样式，图标样式配置在插件 index.js 文件首部 `ADMONITION_CONFIG`，也可自行修改。
+
+#### 2. 引入样式文件
+
+将提供的 CSS 文件放入主题的自定义样式文件夹（如 `Blog/source/css`），并在 `</head>` 标签之前引入：
+
+```html
+<link rel="stylesheet" href="/css/admonition.css">
+```
+
+可自定义配置 CSS 文件，请参考[自定义配置](#自定义配置)。
+
 ## 使用指南
 
-### 语法说明
+### 基础语法
 
-Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（`type`）及标题（`"title"`）。例如:
+Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头，然后是代表提示类型的关键字（type）及标题（"title"）。
 
-```text
-!!!anote Hexo-admonition-new "插件使用示例"
-    这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 anote，并设置了自定义标题。
-提示内容开头留4个空格，可以有多行，行尾2个空格或空一行可换行，换行行首不留空后自动结束提示块。
+```markdown
+!!! info "自定义标题"
+    这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 info，并设置了自定义标题。
+    支持多行内容。
 ```
+**注意**：提示内容需要缩进 4 个空格或 1 个制表符，换行行首不留空后自动结束提示块。
 
 在 Hexo 渲染前，将被转换成如下内容：
 
-```html
-<div class="admonition anote">
+```CSS
+<div class="admonition info">
   <p class="admonition-title">
     <span class="mdi mdi-information-outline admonition-icon"></span>
-    "Hexo-admonition 插件使用示例"
+    "自定义标题"
   </p>
   <div class="admonition-content">
-    <p>这是基于 hexo-admonition 插件渲染的一条提示信息。类型为 note，并设置了自定义标题。</p>
+    <p>
+      "这是基于 hexo-admonition-new 插件渲染的一条提示信息。类型为 info，并设置了自定义标题。"
+      <br>
+      "支持多行内容。"
+    </p>
   </div>
 </div>
-<p>提示内容开头留4个空格，可以有多行，行尾2个空格或空一行可换行，换行行首不留空后自动结束提示块。</p>
 ```
-**整体上提示块内语法遵从原生 markdown 语法，与 Hexo 中的语法略有区别，后续有时间考虑优化为取消预渲染，改为使用 Hexo 渲染来保持语法统一**
+
+### 折叠功能
+
+#### 可折叠且默认展开
+
+以 `!!!+` 开头
+
+```markdown
+!!!+ warning "点击可折叠"
+    这个提示块默认展开，可以点击标题折叠它。
+    适合包含重要但可选的补充信息。
+```
+
+![](https://s2.loli.net/2026/01/12/q6dSuAfN15MTXlV.png)
+
+
+#### 可折叠且默认折叠
+
+以 `!!!-` 开头
+
+```markdown
+!!!- warning "点击展开查看警告"
+    这个警告块默认折叠，需要点击才能看到内容。
+    适合包含详细的技术细节或不常用的信息。
+```
+
+![](https://s2.loli.net/2026/01/12/o7JFw5cQ4kCZlys.png)
+
 
 ### 支持的类型
 
 提示类型 `type` 将用作 CSS 类名称，暂支持如下类型：
 
-- `anote` **不使用note为防止受css样式影响**
-- `info, todo`
-- `warning, attention, caution`
-- `error, failure, missing, fail, danger, bug`
+- `anote` **不使用 "note" 为防止受 CSS 样式影响**
+- `info`, `todo`
+- `warning`, `attention`, `caution`
+- `error`, `failure`, `missing`, `fail`, `danger`, `bug`
 - `success`
 - `tip`
 - `question`
 - `example`
 - `quote`
 
-各具体样式可参考 https://s2.loli.net/2025/08/17/po7nrv1CyJlhG8q.png
+各类型样式效果可参考：https://s2.loli.net/2025/08/17/po7nrv1CyJlhG8q.png
 
-### 设置/隐藏标题
+### 自定义标题
+
+#### 使用默认标题
 
 标题 `title` 是可选的，当未设置时，将以 `type` 作为默认值:
 
 ```text
-!!!warning
+!!! warning
     这是一条采用默认标题的警告信息。
 ```
 
-效果如下：
+![](https://s2.loli.net/2026/01/12/a7SJKUlWDh1PL9s.png)
 
-![原默认标题警告提示块](https://pic.lixl.cn/2020/image-20200419232137875.png)
+#### 自定义标题
+
+```markdown
+!!! warning "小心！"
+    这是自定义标题的警告信息。
+```
+
+![](https://s2.loli.net/2026/01/12/KtNDYOrg2AbmpLM.png)
+
+
+#### 隐藏标题
 
 如果不想显示标题，可以将 `title` 设置为 `""`：
 
-```text
-!!!Warning ""
-    这是一条不带标题的警告信息。
+```markdown
+!!! warning ""
+    这是不带标题的警告信息。
 ```
 
-效果如下：
+![](https://s2.loli.net/2026/01/12/QWimgGxaMyw9AOn.png)
 
-![原无标题警告提示块](https://pic.lixl.cn/2020/image-20200419232337937.png)
+#### 隐藏正文
+
+```markdown
+!!! warning "这是只有标题的提示信息"
+```
+
+![](https://s2.loli.net/2026/01/12/wTXKWGP6hfdbC9j.png)
 
 ### 嵌套支持
 
-在 `hexo-admonition` 内部，支持嵌套多层和引用以及代码块等，由首页[效果图](#简介)可见。
+支持嵌套多层和引用以及代码块等，由首页[效果图](#简介)可见。
 
-```text
+```markdown
 !!! warning "小心！"
     这是一个警告内容。
 
@@ -103,31 +174,116 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
         ```js
         console.log("支持代码块");
         ```
-        
+    你好
+
     !!! info "内层块"
-      这是内层嵌套的提示内容
+        这是内层嵌套的提示内容
+            !!! danger "内层块"
+                这是内层嵌套的提示内容
 ```
 
-### 样式配置
+## CSS 文件
 
-插入代码到头部 `</head>` 之前，与下文 .css 文件配合以显示图标样式，图标样式配置在插件 index.js 文件首部 `iconMap`，也可自行修改。
-```bash
-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-```
-新建如下 .css 文件放入 hexo 主题的自定义样式文件夹中 (如: Blog\source\css)，并插入到头部 `</head>` 之前，
-```bash
-- <link rel="stylesheet" href="/css/admonition.css">
-```
 我懒得区分 error, danger 等的图标和颜色了，可按自己喜好修改：
 
 ```css
+/* ==================== CSS 变量定义 ==================== */
+:root {
+  /* 基础样式变量 */
+  --admonition-bg: #f9f9f9;
+  --admonition-title-bg: rgba(0, 0, 0, 0.03);
+  --admonition-title-hover-bg: rgba(0, 0, 0, 0.06);
+  --admonition-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --admonition-padding: 0.6rem 1rem;
+  --admonition-border-width: 0.3rem;
+  --admonition-border-radius: 0.4rem;
+
+  /* 类型颜色 - 浅色模式 */
+  --color-anote: #448aff;
+  --color-anote-bg: #448aff1a;
+  --color-anote-text: #2962ff;
+
+  --color-info: #00b8d4;
+  --color-info-bg: rgba(0, 184, 212, 0.1);
+  --color-info-text: #007c91;
+
+  --color-warning: #ff9100;
+  --color-warning-bg: rgba(255, 145, 0, 0.1);
+  --color-warning-text: #c66900;
+
+  --color-error: #ff5252;
+  --color-error-bg: rgba(255, 82, 82, 0.1);
+  --color-error-text: #b71c1c;
+
+  --color-tip: #00bfa5;
+  --color-tip-bg: #00bfa51a;
+  --color-tip-text: #00796b;
+
+  --color-success: #00c853;
+  --color-success-bg: #00c8531a;
+  --color-success-text: #2e7d32;
+
+  --color-question: #64dd17;
+  --color-question-bg: #64dd171a;
+  --color-question-text: #558b2f;
+
+  --color-example: #7c4dff;
+  --color-example-bg: #7c4dff1a;
+  --color-example-text: #512da8;
+
+  --color-quote: #9e9e9e;
+  --color-quote-bg: #9e9e9e1a;
+  --color-quote-text: #424242;
+}
+
+/* 深色模式变量 */
+[data-theme="dark"] {
+  --admonition-bg: #1e1e1e;
+  --admonition-title-bg: rgba(255, 255, 255, 0.05);
+  --admonition-title-hover-bg: rgba(255, 255, 255, 0.08);
+  --admonition-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+
+  --color-anote: #82b1ff;
+  --color-anote-bg: #82b1ff1a;
+  --color-anote-text: #bbdefb;
+
+  --color-warning: #ffb300;
+  --color-warning-bg: #ffb3001a;
+  --color-warning-text: #ffe082;
+
+  --color-error: #ef5350;
+  --color-error-bg: #ef53501a;
+  --color-error-text: #ff8a80;
+
+  --color-tip: #64ffda;
+  --color-tip-bg: #64ffda1a;
+  --color-tip-text: #1de9b6;
+
+  --color-success: #69f0ae;
+  --color-success-bg: #69f0ae1a;
+  --color-success-text: #00e676;
+
+  --color-question: #b2ff59;
+  --color-question-bg: #b2ff591a;
+  --color-question-text: #aeea00;
+
+  --color-example: #b388ff;
+  --color-example-bg: #b388ff1a;
+  --color-example-text: #b39ddb;
+
+  --color-quote: #bdbdbd;
+  --color-quote-bg: #bdbdbd1a;
+  --color-quote-text: #eeeeee;
+}
+
+/* ==================== 基础样式 ==================== */
 .admonition {
   margin: 1em 0;
-  padding: 0rem;
-  border-left: 0.3rem solid;
-  border-radius: 0.4rem;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  padding: 0;
+  border-left: var(--admonition-border-width) solid;
+  border-radius: var(--admonition-border-radius);
+  background-color: var(--admonition-bg);
+  box-shadow: var(--admonition-shadow);
   overflow: hidden;
   page-break-inside: avoid;
 }
@@ -136,11 +292,11 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   display: flex;
   align-items: center;
   font-weight: 600;
-  padding: 0rem 1rem 0.1rem 0.75rem;
+  padding: 0 1rem 0.1rem 0.75rem;
   font-size: 1.05em;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-top-left-radius: 0.4rem;
-  border-top-right-radius: 0.4rem;
+  background-color: var(--admonition-title-bg);
+  border-top-left-radius: var(--admonition-border-radius);
+  border-top-right-radius: var(--admonition-border-radius);
   margin: 0 !important;
 }
 
@@ -151,203 +307,286 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
   margin-top: 0.1rem;
 }
 
-/* 内容区域 margin */
-.admonition > *:not(.admonition-title) {
-  margin: 0.6rem 1rem 0.6rem 1rem;
+/* 内容区域 */
+.admonition>.admonition-content {
+  margin: var(--admonition-padding);
 }
 
-/* NOTE 类型 */
+.admonition>*:not(.admonition-title):not(.admonition-collapsible):not(.admonition-content) {
+  margin: var(--admonition-padding);
+}
+
+/* ==================== 折叠功能 ==================== */
+.admonition-collapsible-wrapper {
+  padding: 0;
+  overflow: visible;
+}
+
+.admonition>.admonition-collapsible {
+  margin: 0 !important;
+  width: 100%;
+}
+
+.admonition-collapsible>summary.admonition-title {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s ease;
+  padding-right: 2.5rem;
+}
+
+.admonition-collapsible>summary::-webkit-details-marker,
+.admonition-collapsible>summary::marker {
+  display: none;
+}
+
+.admonition-collapsible>summary.admonition-title:hover {
+  background-color: var(--admonition-title-hover-bg);
+}
+
+.admonition-title-text {
+  flex: 1;
+}
+
+.admonition-chevron {
+  position: absolute;
+  right: 0.75rem;
+  font-size: 1.2em;
+  transition: transform 0.25s ease;
+  opacity: 0.7;
+}
+
+.admonition-collapsible[open]>summary .admonition-chevron {
+  transform: rotate(180deg);
+}
+
+/* 折叠内容 */
+.admonition-collapsible .admonition-content {
+  padding: var(--admonition-padding);
+  animation: slideDown 0.25s ease-out;
+}
+
+/* 嵌套块 */
+.admonition-collapsible .admonition-content>.admonition {
+  margin: 0.6rem 0;
+}
+
+.admonition-collapsible .admonition-content>.admonition:first-child {
+  margin-top: 0;
+}
+
+.admonition-collapsible .admonition-content>.admonition:last-child {
+  margin-bottom: 0;
+}
+
+.admonition-collapsible .admonition-content>*:not(.admonition):first-child {
+  margin-top: 0 !important;
+}
+
+.admonition-collapsible .admonition-content>*:not(.admonition):last-child {
+  margin-bottom: 0 !important;
+}
+
+.admonition-collapsible .admonition-content>.admonition>.admonition-content {
+  margin: var(--admonition-padding);
+  padding: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 类型颜色（使用变量） ==================== */
+
+/* Note */
 .admonition.anote {
-  border-color: #448aff;
-}
-.admonition.anote > .admonition-title {
-  background-color: #448aff1a;
-  color: #2962ff;
+  border-color: var(--color-anote);
 }
 
-/* INFO / TODO 类型 */
+.admonition.anote>.admonition-title,
+.admonition.anote>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-anote-bg);
+  color: var(--color-anote-text);
+}
+
+/* Info / Todo */
 .admonition.info,
 .admonition.todo {
-  border-color: #00b8d4;
-}
-.admonition.info > .admonition-title,
-.admonition.todo > .admonition-title {
-  background-color: rgba(0, 184, 212, 0.1);
-  color: #007c91;
+  border-color: var(--color-info);
 }
 
-/* 警告类 */
+.admonition.info>.admonition-title,
+.admonition.todo>.admonition-title,
+.admonition.info>.admonition-collapsible>summary.admonition-title,
+.admonition.todo>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+/* Warning / Attention / Caution */
 .admonition.warning,
 .admonition.attention,
 .admonition.caution {
-  border-color: #ff9100;
-}
-.admonition.warning > .admonition-title,
-.admonition.attention > .admonition-title,
-.admonition.caution > .admonition-title {
-  background-color: rgba(255, 145, 0, 0.1);
-  color: #c66900;
+  border-color: var(--color-warning);
 }
 
-/* 错误类 */
+.admonition.warning>.admonition-title,
+.admonition.attention>.admonition-title,
+.admonition.caution>.admonition-title,
+.admonition.warning>.admonition-collapsible>summary.admonition-title,
+.admonition.attention>.admonition-collapsible>summary.admonition-title,
+.admonition.caution>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+/* Error / Failure / Fail / Danger / Bug / Missing */
 .admonition.failure,
 .admonition.missing,
 .admonition.fail,
 .admonition.error,
 .admonition.danger,
 .admonition.bug {
-  border-color: #ff5252;
-}
-.admonition.failure > .admonition-title,
-.admonition.missing > .admonition-title,
-.admonition.fail > .admonition-title,
-.admonition.error > .admonition-title,
-.admonition.danger > .admonition-title,
-.admonition.bug > .admonition-title {
-  background-color: rgba(255, 82, 82, 0.1);
-  color: #b71c1c;
+  border-color: var(--color-error);
 }
 
-/* TIP 类型 */
+.admonition.failure>.admonition-title,
+.admonition.missing>.admonition-title,
+.admonition.fail>.admonition-title,
+.admonition.error>.admonition-title,
+.admonition.danger>.admonition-title,
+.admonition.bug>.admonition-title,
+.admonition.failure>.admonition-collapsible>summary.admonition-title,
+.admonition.missing>.admonition-collapsible>summary.admonition-title,
+.admonition.fail>.admonition-collapsible>summary.admonition-title,
+.admonition.error>.admonition-collapsible>summary.admonition-title,
+.admonition.danger>.admonition-collapsible>summary.admonition-title,
+.admonition.bug>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+/* Tip */
 .admonition.tip {
-  border-color: #00bfa5;
-}
-.admonition.tip > .admonition-title {
-  background-color: #00bfa51a;
-  color: #00796b;
+  border-color: var(--color-tip);
 }
 
-/* SUCCESS 类型 */
+.admonition.tip>.admonition-title,
+.admonition.tip>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-tip-bg);
+  color: var(--color-tip-text);
+}
+
+/* Success */
 .admonition.success {
-  border-color: #00c853;
-}
-.admonition.success > .admonition-title {
-  background-color: #00c8531a;
-  color: #2e7d32;
+  border-color: var(--color-success);
 }
 
-/* QUESTION 类型 */
+.admonition.success>.admonition-title,
+.admonition.success>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+/* Question */
 .admonition.question {
-  border-color: #64dd17;
-}
-.admonition.question > .admonition-title {
-  background-color: #64dd171a;
-  color: #558b2f;
+  border-color: var(--color-question);
 }
 
-/* EXAMPLE 类型 */
+.admonition.question>.admonition-title,
+.admonition.question>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-question-bg);
+  color: var(--color-question-text);
+}
+
+/* Example */
 .admonition.example {
-  border-color: #7c4dff;
-}
-.admonition.example > .admonition-title {
-  background-color: #7c4dff1a;
-  color: #512da8;
+  border-color: var(--color-example);
 }
 
-/* QUOTE 类型 */
+.admonition.example>.admonition-title,
+.admonition.example>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-example-bg);
+  color: var(--color-example-text);
+}
+
+/* Quote */
 .admonition.quote {
-  border-color: #9e9e9e;
-}
-.admonition.quote > .admonition-title {
-  background-color: #9e9e9e1a;
-  color: #424242;
+  border-color: var(--color-quote);
 }
 
-/*黑暗模式*/
-/* 夜间模式基础样式 */
-[data-theme="dark"] .admonition {
-  background-color: #1e1e1e;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+.admonition.quote>.admonition-title,
+.admonition.quote>.admonition-collapsible>summary.admonition-title {
+  background-color: var(--color-quote-bg);
+  color: var(--color-quote-text);
 }
+```
 
-[data-theme="dark"] .admonition-title {
-  background-color: rgba(255, 255, 255, 0.05);
-}
+## 自定义配置
 
-/* anote */
-[data-theme="dark"] .admonition.anote {
-  border-color: #82b1ff;
-}
-[data-theme="dark"] .admonition.anote > .admonition-title {
-  background-color: #82b1ff1a;
-  color: #bbdefb;
-}
+### 修改颜色
 
-/* tip */
-[data-theme="dark"] .admonition.tip {
-  border-color: #64ffda;
-}
-[data-theme="dark"] .admonition.tip > .admonition-title {
-  background-color: #64ffda1a;
-  color: #1de9b6;
-}
+编辑 CSS 文件中的变量：
 
-/* success */
-[data-theme="dark"] .admonition.success {
-  border-color: #69f0ae;
+```css
+:root {
+  --color-info: #YOUR_COLOR;
+  --color-info-bg: rgba(YOUR_RGB, 0.1);
+  --color-info-text: #YOUR_TEXT_COLOR;
 }
-[data-theme="dark"] .admonition.success > .admonition-title {
-  background-color: #69f0ae1a;
-  color: #00e676;
-}
+```
 
-/* question */
-[data-theme="dark"] .admonition.question {
-  border-color: #b2ff59;
-}
-[data-theme="dark"] .admonition.question > .admonition-title {
-  background-color: #b2ff591a;
-  color: #aeea00;
-}
+### 修改图标
 
-/* example */
-[data-theme="dark"] .admonition.example {
-  border-color: #b388ff;
-}
-[data-theme="dark"] .admonition.example > .admonition-title {
-  background-color: #b388ff1a;
-  color: #b39ddb;
-}
+图标来自 [Material Design Icons](https://materialdesignicons.com/)
 
-/* quote */
-[data-theme="dark"] .admonition.quote {
-  border-color: #bdbdbd;
-}
-[data-theme="dark"] .admonition.quote > .admonition-title {
-  background-color: #bdbdbd1a;
-  color: #eeeeee;
-}
+编辑插件 JavaScript 文件中的 `iconMap`：
 
-/* warning / attention / caution */
-[data-theme="dark"] .admonition.warning,
-[data-theme="dark"] .admonition.attention,
-[data-theme="dark"] .admonition.caution {
-  border-color: #ffb300;
-}
-[data-theme="dark"] .admonition.warning > .admonition-title,
-[data-theme="dark"] .admonition.attention > .admonition-title,
-[data-theme="dark"] .admonition.caution > .admonition-title {
-  background-color: #ffb3001a;
-  color: #ffe082;
-}
+```javascript
+const ADMONITION_CONFIG = {
+  iconMap: {
+    info: 'mdi-your-icon-name',
+    // ...
+  }
+};
+```
 
-/* error / fail / failure / bug / danger / missing */
-[data-theme="dark"] .admonition.error,
-[data-theme="dark"] .admonition.fail,
-[data-theme="dark"] .admonition.failure,
-[data-theme="dark"] .admonition.bug,
-[data-theme="dark"] .admonition.missing,
-[data-theme="dark"] .admonition.danger {
-  border-color: #ef5350;
+### 添加新类型
+
+1. 在 JavaScript 的 `iconMap` 和 `defaultTitles` 中添加新类型
+2. 在 CSS 中添加对应的颜色样式
+
+```javascript
+// JavaScript
+const ADMONITION_CONFIG = {
+  iconMap: {
+    custom: 'mdi-star',
+    // ...
+  },
+  defaultTitles: {
+    custom: 'Custom',
+    // ...
+  }
+};
+```
+
+```css
+/* CSS */
+.admonition.custom {
+  border-color: #YOUR_COLOR;
 }
-[data-theme="dark"] .admonition.error > .admonition-title,
-[data-theme="dark"] .admonition.fail > .admonition-title,
-[data-theme="dark"] .admonition.failure > .admonition-title,
-[data-theme="dark"] .admonition.bug > .admonition-title,
-[data-theme="dark"] .admonition.missing > .admonition-title,
-[data-theme="dark"] .admonition.danger > .admonition-title {
-  background-color: #ef53501a;
-  color: #ff8a80;
+.admonition.custom > .admonition-title {
+  background-color: rgba(YOUR_RGB, 0.1);
+  color: #YOUR_TEXT_COLOR;
 }
 ```
 
@@ -358,5 +597,5 @@ MIT
 ## 参考
 
 - [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/admonitions/)
-- [markdown-it](https://github.com/markdown-it/markdown-it)
+- [Material Design Icons](https://materialdesignicons.com/)
 - [hexo-admonition](https://github.com/lxl80/hexo-admonition)
