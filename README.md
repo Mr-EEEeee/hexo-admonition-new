@@ -1,11 +1,3 @@
-<div align="center">
-
-[English](./README_EN.md) | 简体中文
-
-</div>
-
----
-
 # Hexo-admonition-new 插件安装使用指南
 
 ## 简介
