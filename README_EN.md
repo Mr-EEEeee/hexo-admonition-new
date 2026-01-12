@@ -29,18 +29,6 @@ npm install hexo-admonition-new --save
 
 ### Style Configuration
 
-#### 1. Include Icon Library
-
-Add before the `</head>` tag in your theme:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-```
-
-This works with the CSS file below to display icon styles. Icon style configuration is at the beginning of the plugin's index.js file in `ADMONITION_CONFIG`, which can also be modified as needed.
-
-#### 2. Include Stylesheet
-
 Place the provided CSS file in your theme's custom style folder (e.g., `Blog/source/css`), and include it before the `</head>` tag:
 
 ```html
@@ -554,6 +542,10 @@ Edit the variables in the CSS file:
 ```
 
 ### Modify Icons
+
+The icon library is automatically injected before the `</head>` tag of your theme. If you need to change the library, you can modify the `iconLibrary` variable in the index.js file.
+
+To display the icon styles, this works in conjunction with the CSS file. The icon configurations are located in the `ADMONITION_CONFIG` section at the top of the index.js file and can be customized as needed.
 
 Icons are from [Material Design Icons](https://materialdesignicons.com/)
 

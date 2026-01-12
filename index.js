@@ -1,4 +1,4 @@
-// 配置外部化 - 便于维护和未来可能的扩展
+// 配置外部化 - 便于维护和扩展 / Configuration externalized for easy maintenance
 const ADMONITION_CONFIG = {
   iconMap: {
     anote: 'mdi-note-outline',
@@ -40,31 +40,42 @@ const ADMONITION_CONFIG = {
   }
 };
 
+// 自动注入图标库 / Auto-inject icon library
+hexo.extend.filter.register('after_render:html', function (str) {
+  // 检查是否已注入，避免重复 / Check if already injected to avoid duplication
+  if (str.includes('materialdesignicons.min.css') || str.includes('hexo-admonition-icon-injected')) {
+    return str;
+  }
+
+  // 注入图标库到 <head> / Inject icon library into <head>
+  const iconLibrary = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" id="hexo-admonition-icon-injected">\n  ';
+
+  return str.replace('</head>', iconLibrary + '</head>');
+});
+
+// 解析提示块 / Parse admonition blocks
 hexo.extend.filter.register('before_post_render', function (data) {
   const lines = data.content.split(/\r?\n/);
   const result = [];
 
   const { iconMap, defaultTitles } = ADMONITION_CONFIG;
 
-  // 动态生成正则 - 自动从 iconMap 获取类型
+  // 动态生成正则，自动从 iconMap 获取类型 / Dynamically generate regex from iconMap
   const types = Object.keys(iconMap).join('|');
   const blockRegex = new RegExp(`^(\\s*)!!!\\s*([+\\-])?\\s*(${types})\\s*(?:"(.*?)")?\\s*$`, 'i');
 
   /**
-   * 转义字符串中的特殊正则字符 / Escapes special regex characters in a string
-   * @param {string} string - String to escape / 需要转义的字符串
-   * @returns {string} Escaped string / 转义后的字符串
+   * 转义正则特殊字符 / Escape special regex characters
    */
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   /**
-   * Parses an admonition block and returns HTML
-   * 解析提示块并返回 HTML
-   * @param {number} startIndex - Starting line index / 起始行索引
-   * @param {string} parentIndent - Parent indentation level / 父级缩进级别
-   * @returns {{end: number, html: string|null}} Parsing result / 解析结果
+   * 解析提示块并返回 HTML / Parse admonition block and return HTML
+   * @param {number} startIndex - 起始行索引 / Starting line index
+   * @param {string} parentIndent - 父级缩进 / Parent indentation level
+   * @returns {{end: number, html: string|null}} 解析结果 / Parsing result
    */
   function parseAdmonition(startIndex, parentIndent = '') {
     const match = lines[startIndex].match(blockRegex);
@@ -77,46 +88,50 @@ hexo.extend.filter.register('before_post_render', function (data) {
     const title = titleRaw?.trim() || defaultTitles[type];
     const icon = iconMap[type] || 'mdi-alert-circle-outline';
 
-    // 判断是否可折叠及默认状态 / Determine collapsible state and default status
+    // 判断折叠状态 / Determine collapsible state
+    // !!! = 不可折叠 / non-collapsible
+    // !!!+ = 可折叠，默认展开 / collapsible, default open
+    // !!!- = 可折叠，默认折叠 / collapsible, default closed
     const isCollapsible = collapseModifier === '+' || collapseModifier === '-';
     const isDefaultOpen = collapseModifier === '+';
 
     const contentLines = [];
     let i = startIndex + 1;
 
-    // 构建正则以去除父级缩进 + 可选的4个空格或制表符
+    // 构建正则以去除缩进 / Build regex to strip indentation
     const escIndent = escapeRegExp(indent || '');
     const stripRegex = new RegExp('^' + escIndent + '(?: {4}|\t)?');
 
+    // 收集内容行 / Collect content lines
     while (i < lines.length) {
       const line = lines[i];
       const nextMatch = line.match(blockRegex);
-
-      // 检查是否为嵌套提示块
       const isNested = nextMatch && nextMatch[1].length > (indent?.length || 0);
 
       if (isNested) {
+        // 处理嵌套块 / Handle nested blocks
         const nested = parseAdmonition(i, nextMatch[1]);
         if (nested.html) contentLines.push(nested.html);
         i = nested.end;
       } else if (nextMatch) {
+        // 遇到同级或更低级别的块，停止 / Stop at same or lower level block
         break;
       } else if (/^\s*$/.test(line) || line.startsWith((indent || '') + '    ') || line.startsWith((indent || '') + '\t')) {
+        // 内容行 / Content line
         contentLines.push(line.replace(stripRegex, ''));
         i++;
       } else {
+        // 不匹配的行，停止 / Stop at non-matching line
         break;
       }
     }
 
-    // 保留 Markdown 内容供 Hexo 后续渲染
+    // 保留 Markdown 原始内容供 Hexo 渲染 / Keep raw Markdown for Hexo to render
     const contentMarkdown = contentLines.join('\n');
     const isEmpty = contentMarkdown.trim() === '';
-
-    // 构建内容 HTML（DRY 优化）
     const contentHtml = isEmpty ? '' : `<div class="admonition-content">\n\n${contentMarkdown}\n\n</div>`;
 
-    // 构建最终 HTML（减少重复代码）
+    // 构建 HTML / Build HTML
     let html;
     if (isCollapsible) {
       const collapsibleClass = isDefaultOpen ? 'collapsible-open' : 'collapsible-closed';
@@ -140,7 +155,7 @@ hexo.extend.filter.register('before_post_render', function (data) {
     return { end: i, html: html + '\n' };
   }
 
-  // 主解析循环
+  // 主解析循环 / Main parsing loop
   let i = 0;
   while (i < lines.length) {
     const match = lines[i].match(blockRegex);

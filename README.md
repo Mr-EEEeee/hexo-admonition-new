@@ -29,18 +29,6 @@ npm install hexo-admonition-new --save
 
 ### 样式配置
 
-#### 1. 引入图标库
-
-在主题的 `</head>` 标签之前添加：
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-```
-
-与下文 CSS 文件配合以显示图标样式，图标样式配置在插件 index.js 文件首部 `ADMONITION_CONFIG`，也可自行修改。
-
-#### 2. 引入样式文件
-
 将提供的 CSS 文件放入主题的自定义样式文件夹（如 `Blog/source/css`），并在 `</head>` 标签之前引入：
 
 ```html
@@ -554,6 +542,10 @@ Hexo-admonition-new 遵循一种简单的语法：每个块都以 `!!!` 开头�
 ```
 
 ### 修改图标
+
+已在主题的 `</head>` 标签之前自动注入了图标库，如需修改库，可在 index.js 文件中修改 `iconLibrary` 。
+
+与 CSS 文件配合以显示图标样式，图标样式配置在插件 index.js 文件首部 `ADMONITION_CONFIG`，也可自行修改。
 
 图标来自 [Material Design Icons](https://materialdesignicons.com/)
 
